@@ -8,7 +8,7 @@ export function middleware(req: Request, res:Response, next: NextFunction){
     const decoded = jwt.verify(token, JWT_TOKEN_SECRET);
 
     if(decoded){
-        // @ts-ignore
+        // @ts-ignore TODO:
         req.userId = decoded.userId; // Assuming the token contains a userId
         next();
 
