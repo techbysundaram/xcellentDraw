@@ -1,1 +1,0 @@
-export const JWT_TOKEN_SECRET = "your_jwt_secret_here";
