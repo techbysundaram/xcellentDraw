@@ -8,7 +8,14 @@ import {
   CreateRoomSchema,
 } from "@repo/common/types";
 
+const PORT = process.env.PORT || 3001;
 const app = express();
+
+app.get("/", (req, res) => {
+  res.json({
+    message: "Hello from the backend!",
+  });
+});
 
 app.post("/signup", (req, res) => {
   const data = CreateUserSchema.safeParse(req.body);
@@ -59,4 +66,6 @@ app.post("/room", middleware, (req, res) => {
   });
 });
 
-app.listen(3000);
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
