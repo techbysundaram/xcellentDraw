@@ -8,6 +8,8 @@ import {
   CreateRoomSchema,
 } from "@repo/common/types";
 
+import { prismaClient} from "@repo/db/client"
+
 const PORT = process.env.PORT || 3001;
 const app = express();
 
@@ -17,19 +19,34 @@ app.get("/", (req, res) => {
   });
 });
 
-app.post("/signup", (req, res) => {
-  const data = CreateUserSchema.safeParse(req.body);
+app.post("/signup", async (req, res) => {
+  const parseData = CreateUserSchema.safeParse(req.body);
 
-  if (!data.success) {
+  if (!parseData.success) {
     res.json({
       message: "Invalid data",
     });
     return;
   }
+
+  try{
+    await prismaClient.user.create({
+    data:{
+      email: parseData.data.username,
+      password: parseData.data.password,
+      name: parseData.data.name,
+    }
+  })
   //db call
   res.json({
     userId: 123,
   });
+  }catch(e){
+    res.status(411).json({
+      message: "User already exists wiht this username"
+    })
+  }
+  
 });
 
 app.post("/signin", (req, res) => {
