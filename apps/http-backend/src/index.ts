@@ -31,7 +31,7 @@ app.post("/signup", async (req, res) => {
   }
 
   try{
-    await prismaClient.user.create({
+    const user = await prismaClient.user.create({
     data:{
       email: parseData.data.username,
       password: parseData.data.password,
@@ -40,7 +40,7 @@ app.post("/signup", async (req, res) => {
   })
   //db call
   res.json({
-    userId: 123,
+    userId: user?.id,
   });
   }catch(e){
     res.status(411).json({
