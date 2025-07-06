@@ -8,7 +8,7 @@ import {
   CreateRoomSchema,
 } from "@repo/common/types";
 
-import { prismaClient} from "@repo/db/client"
+import { prismaClient } from "@repo/db/client";
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -30,58 +30,88 @@ app.post("/signup", async (req, res) => {
     return;
   }
 
-  try{
+  try {
     const user = await prismaClient.user.create({
-    data:{
-      email: parseData.data.username,
-      password: parseData.data.password,
-      name: parseData.data.name,
-    }
-  })
-  //db call
-  res.json({
-    userId: user?.id,
-  });
-  }catch(e){
+      data: {
+        email: parseData.data.username,
+        //hash the password before storing
+        password: parseData.data.password,
+        name: parseData.data.name,
+      },
+    });
+    //db call
+    res.json({
+      message: `User created with user ID ${user?.id}`,
+    });
+  } catch (e) {
     res.status(411).json({
-      message: "User already exists wiht this username"
-    })
+      message: "User already exists wiht this username",
+    });
   }
-  
 });
 
-app.post("/signin", (req, res) => {
-  const data = SigninSchema.safeParse(req.body);
+app.post("/signin", async (req, res) => {
+  const parsedData = SigninSchema.safeParse(req.body);
 
-  if (!data.success) {
+  if (!parsedData.success) {
     res.json({
       message: "Invalid data",
     });
     return;
   }
-  const userId = 1;
-  const token = jwt.sign({ userId }, JWT_TOKEN_SECRET);
+  const user = await prismaClient.user.findFirst({
+    where:{
+      email: parsedData.data.username,
+      password: parsedData.data.password
+    }
+  })
+
+   if(!user){
+    res.json({
+      message: "User not found"
+    })
+    return;
+  }
+
+  const token = jwt.sign({ userId: user?.id }, JWT_TOKEN_SECRET);
 
   res.json({
     token,
   });
 });
 
-app.post("/room", middleware, (req, res) => {
+app.post("/room", middleware, async (req, res) => {
   //check the schema
 
-  const data = CreateRoomSchema.safeParse(req.body);
+  const parsedData = CreateRoomSchema.safeParse(req.body);
 
-  if (!data.success) {
+  if (!parsedData.success) {
     res.json({
       message: "Invalid data",
     });
     return;
   }
 
+  try{
+      //@ts-ignore TODO: fix this
+  const userId = req.userId;
+
+  const room = await prismaClient.room.create({
+    data: {
+      slug: parsedData.data.name,
+      adminId: userId
+    }
+  })
+
   res.json({
-    roomId: 123,
+    roomId: room.id,
   });
+  }catch(e){
+    res.status(411).json({
+      message:"room already exist"
+    })
+  }
+
 });
 
 app.listen(PORT, () => {
