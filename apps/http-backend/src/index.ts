@@ -60,16 +60,16 @@ app.post("/signin", async (req, res) => {
     return;
   }
   const user = await prismaClient.user.findFirst({
-    where:{
+    where: {
       email: parsedData.data.username,
-      password: parsedData.data.password
-    }
-  })
+      password: parsedData.data.password,
+    },
+  });
 
-   if(!user){
+  if (!user) {
     res.json({
-      message: "User not found"
-    })
+      message: "User not found",
+    });
     return;
   }
 
@@ -92,26 +92,42 @@ app.post("/room", middleware, async (req, res) => {
     return;
   }
 
-  try{
-      //@ts-ignore TODO: fix this
-  const userId = req.userId;
+  try {
+    //@ts-ignore TODO: fix this
+    const userId = req.userId;
 
-  const room = await prismaClient.room.create({
-    data: {
-      slug: parsedData.data.name,
-      adminId: userId
-    }
-  })
+    const room = await prismaClient.room.create({
+      data: {
+        slug: parsedData.data.name,
+        adminId: userId,
+      },
+    });
+
+    res.json({
+      roomId: room.id,
+    });
+  } catch (e) {
+    res.status(411).json({
+      message: "room already exist",
+    });
+  }
+});
+
+app.get("/chats/:roomId", async (req, res) => {
+  const roomId = Number(req.params.roomId);
+  const message = await prismaClient.chat.findMany({
+    where: {
+      roomId: roomId,
+    },
+    orderBy: {
+      id: "desc",
+    },
+    take: 50,
+  });
 
   res.json({
-    roomId: room.id,
+    message,
   });
-  }catch(e){
-    res.status(411).json({
-      message:"room already exist"
-    })
-  }
-
 });
 
 app.listen(PORT, () => {
