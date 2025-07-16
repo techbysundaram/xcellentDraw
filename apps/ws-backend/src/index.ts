@@ -66,6 +66,8 @@ wss.on("connection", function connection(ws, request) {
   ws.on("message", async function message(data) {
     const parseData = JSON.parse(data as unknown as string);
 
+    console.log("parseData",parseData)
+
     if (parseData.type === "join_room") {
       const user = users.find((x) => x.ws === ws);
       user?.rooms.push(parseData.roomId);
@@ -83,7 +85,7 @@ wss.on("connection", function connection(ws, request) {
     }
 
     if (parseData.type === "chat") {
-      const roomId = parseData.roomId;
+      const roomId = parseInt(parseData.roomId);
       const message = parseData.message;
 
       //inserting data into DB
@@ -96,7 +98,7 @@ wss.on("connection", function connection(ws, request) {
       });
 
       users.forEach((user) => {
-        if (user.rooms.includes(roomId)) {
+        if (user.rooms.includes(roomId.toString())) {
           user.ws.send(
             JSON.stringify({
               type: "chat",

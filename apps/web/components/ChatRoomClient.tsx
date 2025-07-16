@@ -28,7 +28,6 @@ export default function ChatRoomClient({ messages, id }: ChatRoomClientProps) {
           setChats((c) => [...c, { message: parsedData.message }]);
         }
       }
-      socket?.close();
     }
   }, [socket, loading, id]);
 

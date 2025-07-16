@@ -11,5 +11,6 @@ export async function ChatRoom ({id}:{
     id:string
 }){
     const messages = await getChats(id);
+    console.log("iasddsad",id)
     return <ChatRoomClient id={id} messages={messages}/>
 }
