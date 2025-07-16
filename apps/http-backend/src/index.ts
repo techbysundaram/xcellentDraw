@@ -114,34 +114,43 @@ app.post("/room", middleware, async (req, res) => {
 });
 
 app.get("/chats/:roomId", async (req, res) => {
-  const roomId = Number(req.params.roomId);
-  const message = await prismaClient.chat.findMany({
-    where: {
-      roomId: roomId,
-    },
-    orderBy: {
-      id: "desc",
-    },
-    take: 50,
-  });
+    try {
+        const roomId = Number(req.params.roomId);
+        console.log(req.params.roomId);
+        const messages = await prismaClient.chat.findMany({
+            where: {
+                roomId: roomId
+            },
+            orderBy: {
+                id: "desc"
+            },
+            take: 50
+        });
 
-  res.json({
-    message,
-  });
-});
-
-app.get("/chats/:slug", async (req, res) => {
-  const slug = req.params.slug;
-  const room = await prismaClient.room.findFirst({
-    where: {
-      slug
+        res.json({
+            messages
+        })
+    } catch(e) {
+        console.log(e);
+        res.json({
+            messages: []
+        })
     }
-  });
+    
+})
 
-  res.json({
-    room,
-  });
-});
+app.get("/room/:slug", async (req, res) => {
+    const slug = req.params.slug;
+    const room = await prismaClient.room.findFirst({
+        where: {
+            slug
+        }
+    });
+
+    res.json({
+        room
+    })
+})
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

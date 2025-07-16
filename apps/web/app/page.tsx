@@ -1,24 +1,49 @@
-"use client"
+"use client";
 
 import { useState } from "react";
 import styles from "./page.module.css";
 import { useRouter } from "next/navigation";
 
-export default function Home(){
+export default function Home() {
   const [roomId, setroomId] = useState("");
   const router = useRouter();
 
-  return(
-    <div style={{
-      
-    }}>
-      <input value={roomId} onChange={(e)=>{
-        setroomId(e.target.value);
-      }} name="" id="" type="text" placeholder="Room ID" />
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+        width: "100vw",
+      }}
+    >
+      <div>
+        <input
+          style={{
+            padding: 10,
+          }}
+          value={roomId}
+          onChange={(e) => {
+            setroomId(e.target.value);
+          }}
+          name=""
+          id=""
+          type="text"
+          placeholder="Room ID"
+        />
 
-      <button onClick={()=>{
-        router.push(`/room/${roomId}`)
-      }}>Join Room</button>
+        <button
+          style={{
+            padding: 10,
+          }}
+          onClick={() => {
+            router.push(`/room/${roomId}`);
+          }}
+        >
+          Join Room
+        </button>
+      </div>
     </div>
-  )
+  );
 }
