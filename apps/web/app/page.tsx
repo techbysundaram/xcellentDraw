@@ -30,7 +30,7 @@ export default function Home() {
           name=""
           id=""
           type="text"
-          placeholder="Room ID"
+          placeholder="Room Name"
         />
 
         <button
